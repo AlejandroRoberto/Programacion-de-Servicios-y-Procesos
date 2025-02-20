@@ -30,14 +30,14 @@ class Juego {
             }
         }
 
-        // Crea 5 jugadores
-        for (int i = 1; i <= 5; i++) {
+        // Crea 10 jugadores
+        for (int i = 1; i <= 10; i++) {
             jugadores.add(new Jugador(this, i, ultimaPosicionCorrectaX, ultimaPosicionCorrectaY));
         }
     }
 
     public synchronized boolean saltarBaldosa(int x, int y, int jugadorId) {
-        if (x >= largo) {
+        if (x >= largo-1) {
             juegoTerminado = true;
             System.out.println("Jugador " + jugadorId + " llegó al final del pasillo. ¡Juego terminado!");
             return false;
@@ -47,8 +47,10 @@ class Juego {
             if (y == baldosasSeguras[x]) {
                 System.out.println("Jugador " + jugadorId + " saltó en (" + x + ", " + y + "). Baldosa segura.");
                 // Marca la otra baldosa de la fila como rota
-                int otraBaldosaY = (y + 1) % ancho;
-                tablero[x][otraBaldosaY] = 'X';
+                int otraBaldosaY = (y == 0) ? 1 : 0; // Si la baldosa segura es la 0, la rota será la 1 y viceversa
+                if (tablero[x][otraBaldosaY] == 'O') {
+                    tablero[x][otraBaldosaY] = 'X'; // Marca solo si no está rota ya
+                }
                 actualizarUltimaPosicionCorrecta(x, y);
                 imprimirTablero();
                 return false;
@@ -65,7 +67,7 @@ class Juego {
     public synchronized boolean juegoTerminado() {
         return juegoTerminado;
     }
-    
+
     public int getAncho() {
         return ancho;
     }
@@ -74,6 +76,7 @@ class Juego {
         jugadores.remove(jugador);
         if (!jugadores.isEmpty()) {
             Jugador siguienteJugador = jugadores.get(0);
+            siguienteJugador.setPosicion(ultimaPosicionCorrectaX, ultimaPosicionCorrectaY);
             siguienteJugador.start();
         } else {
             juegoTerminado = true;
